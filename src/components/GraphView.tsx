@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import CustomSelfLoopEdge from './CustomSelfLoopEdge';
 import ReactFlow, { 
     Background, 
     Controls, 
@@ -13,11 +14,14 @@ import type { GraphData } from '../api/client';
 interface GraphViewProps {
     data?: GraphData;
     activeNodeId?: string;
+    activeEdge?: { source: string; target: string } | null;
 }
 
-export const GraphView: React.FC<GraphViewProps> = ({ data, activeNodeId }) => {
+export const GraphView: React.FC<GraphViewProps> = ({ data, activeNodeId, activeEdge }) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [tooltip, setTooltip] = useState<{ visible: boolean; x: number; y: number; text: string }>({ visible: false, x: 0, y: 0, text: '' });
+    const [, setExpandedEdges] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (!data) return;
@@ -61,22 +65,87 @@ export const GraphView: React.FC<GraphViewProps> = ({ data, activeNodeId }) => {
             edgeMap.get(key)!.labels.push(edge.label);
         });
 
-        const newEdges: Edge[] = Array.from(edgeMap.values()).map((edge, i) => ({
-            id: `e${i}`,
-            source: edge.source,
-            target: edge.target,
-            label: edge.labels.join(',\n'), // CSV labels with newlines for readability if too long
-            type: 'default', // Bezier curve for curved lines
-            markerEnd: {
-                type: MarkerType.ArrowClosed,
-            },
-            style: { stroke: '#555' },
-            labelStyle: { fill: '#555', fontWeight: 700, fontSize: 10 }
-        }));
+            const newEdges: Edge[] = Array.from(edgeMap.values()).map((edge, i) => {
+            const id = `e${i}`;
+            const fullLabel = edge.labels.join(', ');
+            const isSelf = edge.source === edge.target;
+            // For self-loops, increase stroke width and offset the label so it doesn't overlap the node.
+            const baseStyle: any = { stroke: isSelf ? '#1e40af' : '#555', strokeWidth: isSelf ? 3 : 1 };
+            const labelStyle: any = { fill: '#111', fontWeight: 700, fontSize: 11 };
+            if (isSelf) {
+                // Move label above the node for better readability
+                labelStyle.transform = 'translateY(-28px)';
+            }
+
+                if (isSelf) {
+                const onHover = (x: number, y: number) => setTooltip({ visible: true, x, y, text: fullLabel });
+                const onMove = (x: number, y: number) => setTooltip(t => ({ ...t, x, y }));
+                const onLeave = () => setTooltip({ visible: false, x: 0, y: 0, text: '' });
+                const onClick = () => { /* handled in custom edge */ };
+
+                return {
+                    id,
+                    source: edge.source,
+                    target: edge.target,
+                    label: '', // label handled by custom self-loop edge renderer for self loops
+                    data: { fullLabel, onHover, onMove, onLeave, onClick, key: `${edge.source}-${edge.target}` },
+                    type: 'selfLoop',
+                    // omit arrowheads on self-loops to reduce overlap
+                    markerEnd: undefined,
+                    style: {
+                        ...baseStyle,
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round'
+                    },
+                    animated: true,
+                    // remove label background so label text overlays cleanly; offset self-loop labels higher
+                    labelStyle: { ...labelStyle, transform: 'translateY(-36px)', background: 'transparent' },
+                } as Edge;
+            }
+
+            return {
+                id,
+                source: edge.source,
+                target: edge.target,
+                label: edge.labels.join(',\n'),
+                data: { fullLabel, key: `${edge.source}-${edge.target}` },
+                type: 'default',
+                markerEnd: { type: MarkerType.ArrowClosed },
+                style: { stroke: '#555' },
+                labelStyle: { fill: '#333', fontWeight: 700, fontSize: 10, pointerEvents: 'none' }
+            } as Edge;
+        });
 
         setNodes(newNodes);
         setEdges(newEdges);
     }, [data, setNodes, setEdges]);
+
+    // When activeEdge changes, update edge styles to highlight the matching edge
+    useEffect(() => {
+        if (!activeEdge) {
+            // reset highlight
+            setEdges(eds => eds.map(e => ({ ...e, style: { ...(e.style || {}), stroke: e.type === 'selfLoop' ? '#1e40af' : '#555', strokeWidth: undefined }, animated: e.type === 'selfLoop' ? true : false })));
+            return;
+        }
+
+        const key = `${activeEdge.source}-${activeEdge.target}`;
+        setEdges(eds => eds.map(e => {
+            const eKey = (e.data && (e.data as any).key) || `${e.source}-${e.target}`;
+            if (eKey === key) {
+                return {
+                    ...e,
+                    style: { ...(e.style || {}), stroke: '#f59e0b', strokeWidth: 4 },
+                    animated: true
+                } as Edge;
+            }
+            // dim other edges slightly
+            return {
+                ...e,
+                style: { ...(e.style || {}), stroke: '#bbb', strokeWidth: e.type === 'selfLoop' ? 2 : 1 },
+                animated: false
+            } as Edge;
+        }));
+    }, [activeEdge, setEdges]);
 
     useEffect(() => {
         setNodes((nds) =>
@@ -101,6 +170,39 @@ export const GraphView: React.FC<GraphViewProps> = ({ data, activeNodeId }) => {
         );
     }, [activeNodeId, setNodes]);
 
+    // Edge hover/click handlers
+    const onEdgeMouseEnter = (_: any, edge: Edge) => {
+        const full = (edge.data && (edge.data as any).fullLabel) || edge.label || '';
+        setTooltip({ visible: true, x: 0, y: 0, text: full });
+    };
+
+    const onEdgeMouseMove = (event: React.MouseEvent, _edge: Edge) => {
+        setTooltip(t => ({ ...t, x: event.clientX + 12, y: event.clientY + 12 }));
+    };
+
+    const onEdgeMouseLeave = (_: any) => {
+        setTooltip({ visible: false, x: 0, y: 0, text: '' });
+    };
+
+    const onEdgeClick = (_: any, edge: Edge) => {
+        setExpandedEdges(prev => {
+            const copy = new Set(prev);
+            if (copy.has(edge.id)) {
+                copy.delete(edge.id);
+            } else {
+                copy.add(edge.id);
+            }
+            setEdges(eds => eds.map(e => {
+                if (e.id === edge.id) {
+                    const full = (edge.data && (edge.data as any).fullLabel) || '';
+                    return { ...e, label: copy.has(edge.id) ? full : (full.length > 60 ? full.slice(0,57) + '…' : full) } as Edge;
+                }
+                return e;
+            }));
+            return copy;
+        });
+    };
+
     return (
         <div className="h-[600px] w-full border border-gray-200 rounded-lg bg-gray-50 shadow-inner">
             <ReactFlow
@@ -108,11 +210,24 @@ export const GraphView: React.FC<GraphViewProps> = ({ data, activeNodeId }) => {
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onEdgeMouseEnter={onEdgeMouseEnter}
+                onEdgeMouseMove={onEdgeMouseMove}
+                onEdgeMouseLeave={onEdgeMouseLeave}
+                onEdgeClick={onEdgeClick}
                 fitView
+                edgeTypes={{ selfLoop: CustomSelfLoopEdge }}
             >
                 <Background color="#aaa" gap={16} />
                 <Controls />
             </ReactFlow>
+
+            {tooltip.visible && (
+                <div style={{ position: 'fixed', left: tooltip.x, top: tooltip.y, zIndex: 9999, pointerEvents: 'none' }}>
+                    <div className="bg-white border border-gray-300 text-sm p-2 rounded shadow">
+                        <div className="font-mono text-xs">{tooltip.text}</div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

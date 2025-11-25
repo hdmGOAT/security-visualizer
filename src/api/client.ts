@@ -5,6 +5,7 @@ export interface Packet {
     service: string;
     conn_state: string;
     host_id: string;
+    data?: string;
 }
 
 export interface SessionResponse {
@@ -24,11 +25,19 @@ export interface DFAPacketResponse {
     label: string;
 }
 
+export interface RequestProcessingResponse {
+    pda: PDAValidationResponse;
+    packets: DFAPacketResponse[];
+    is_malicious?: boolean;
+}
+
 export interface StackOperation {
     step_index: number;
     action: string;
     symbol: string;
     stack: string[];
+    current_state?: string;
+    next_state?: string;
 }
 
 export interface PDAValidationResponse {
@@ -81,9 +90,29 @@ export const api = {
         return response.json();
     },
 
+    getPDAGraph: async (): Promise<GraphData> => {
+        const response = await fetch(`${API_BASE}/pda/graph`);
+        if (!response.ok) throw new Error('Failed to fetch PDA graph');
+        return response.json();
+    },
+
     getDerivation: async (sessionId: string): Promise<{ steps: string[] }> => {
         const response = await fetch(`${API_BASE}/derivation?session_id=${sessionId}`);
         if (!response.ok) throw new Error('Failed to fetch derivation');
+        return response.json();
+    }
+    ,
+
+    sendRequest: async (sessionId: string, hostId: string, packets: Packet[], threshold = 1): Promise<RequestProcessingResponse> => {
+        const response = await fetch(`${API_BASE}/request/process`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId, host_id: hostId, packets, threshold }),
+        });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || 'Failed to send request');
+        }
         return response.json();
     }
 };

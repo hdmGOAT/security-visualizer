@@ -4,13 +4,10 @@ export interface Packet {
     proto: string;
     service: string;
     conn_state: string;
-    host_id: string;
-    data?: string;
+    // host_id and data removed — only symbols used by DFA/PDA are kept
 }
 
-export interface SessionResponse {
-    session_id: string;
-}
+// sessions removed: no SessionResponse
 
 export interface DFAStep {
     current_state: string;
@@ -41,7 +38,6 @@ export interface StackOperation {
 }
 
 export interface PDAValidationResponse {
-    host_id: string;
     is_valid: boolean;
     trace: StackOperation[];
 }
@@ -52,17 +48,11 @@ export interface GraphData {
 }
 
 export const api = {
-    startSession: async (): Promise<SessionResponse> => {
-        const response = await fetch(`${API_BASE}/session`, { method: 'POST' });
-        if (!response.ok) throw new Error('Failed to start session');
-        return response.json();
-    },
-
-    sendPacket: async (sessionId: string, packet: Packet): Promise<DFAPacketResponse> => {
+    sendPacket: async (packet: Packet): Promise<DFAPacketResponse> => {
         const response = await fetch(`${API_BASE}/dfa/step`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, packet }),
+            body: JSON.stringify({ packet }),
         });
         if (!response.ok) {
             const text = await response.text();
@@ -70,12 +60,11 @@ export const api = {
         }
         return response.json();
     },
-
-    validateHost: async (sessionId: string, hostId: string): Promise<PDAValidationResponse> => {
+    validateHistory: async (history: string[]): Promise<PDAValidationResponse> => {
         const response = await fetch(`${API_BASE}/pda/validate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, host_id: hostId }),
+            body: JSON.stringify({ history }),
         });
         if (!response.ok) {
             const text = await response.text();
@@ -96,18 +85,21 @@ export const api = {
         return response.json();
     },
 
-    getDerivation: async (sessionId: string): Promise<{ steps: string[] }> => {
-        const response = await fetch(`${API_BASE}/derivation?session_id=${sessionId}`);
+    getDerivation: async (packet: Packet): Promise<{ steps: string[] }> => {
+        const response = await fetch(`${API_BASE}/derivation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packet }),
+        });
         if (!response.ok) throw new Error('Failed to fetch derivation');
         return response.json();
-    }
-    ,
+    },
 
-    sendRequest: async (sessionId: string, hostId: string, packets: Packet[], threshold = 1): Promise<RequestProcessingResponse> => {
+    sendRequest: async (packets: Packet[], threshold = 1): Promise<RequestProcessingResponse> => {
         const response = await fetch(`${API_BASE}/request/process`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, host_id: hostId, packets, threshold }),
+            body: JSON.stringify({ packets, threshold }),
         });
         if (!response.ok) {
             const text = await response.text();

@@ -2,193 +2,157 @@
   "categories": {
     "benign": [
       {
-        "title": "basic_http_get_flow",
+        "title": "tcp_http_standard_session",
         "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "S0", "data": "GET /" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "200 OK" },
-          { "proto": "tcp", "service": "http", "conn_state": "SF", "data": "" }
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" }
         ]
       },
       {
-        "title": "dns_udp_query_response",
+        "title": "tcp_ssh_standard_session",
         "packets": [
-          { "proto": "udp", "service": "dns", "conn_state": "SF", "data": "QUERY example.com" }
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "SF" }
         ]
       },
       {
-        "title": "icmp_echo_pair",
+        "title": "udp_dns_normal_query",
         "packets": [
-          { "proto": "icmp", "service": "", "conn_state": "OTH", "data": "ECHO_REQUEST" },
-          { "proto": "icmp", "service": "", "conn_state": "OTH", "data": "ECHO_REPLY" }
+          { "proto": "udp", "service": "dns", "conn_state": "OTH" },
+          { "proto": "udp", "service": "dns", "conn_state": "OTH" }
         ]
       },
       {
-        "title": "http_keepalive_simple",
+        "title": "multi_service_handshake",
         "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "S0", "data": "GET /keepalive" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "200 OK" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "" },
-          { "proto": "tcp", "service": "http", "conn_state": "SF", "data": "" }
-        ]
-      },
-      {
-        "title": "ssh_single_connection_attempt",
-        "packets": [
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0", "data": "" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "S1", "data": "" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "SF", "data": "" }
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "SF" },
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" },
+          { "proto": "udp", "service": "dns", "conn_state": "OTH" }
         ]
       }
     ],
-
-    "suspicious": [
-      {
-        "title": "tcp_syn_no_reply",
-        "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" }
-        ]
-      },
-      {
-        "title": "tcp_rej_after_syn",
-        "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "REJ", "data": "" }
-        ]
-      },
-      {
-        "title": "rstos0_event",
-        "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "RSTOS0", "data": "" }
-        ]
-      },
-      {
-        "title": "rstr_then_s1",
-        "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "RSTR", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "S1", "data": "" }
-        ]
-      },
-      {
-        "title": "odd_interleaved_services",
-        "packets": [
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0", "data": "" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "SF", "data": "" }
-        ]
-      },
-      {
-        "title": "s2_state_spike",
-        "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "S2", "data": "" }
-        ]
-      }
-    ],
-
     "malicious": [
       {
-        "title": "multiple_rej_rst_chain",
+        "title": "tcp_syn_flood_scan",
         "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "REJ", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "RSTR", "data": "" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTO", "data": "" }
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" }
         ]
       },
       {
-        "title": "exploit_to_shell_sequence",
+        "title": "irc_botnet_traffic_flood",
         "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "S0", "data": "EXPLOIT" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "SHELL_ACCESS" }
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" }
         ]
       },
       {
-        "title": "repeated_rstos0_then_rstr",
+        "title": "http_c2_beacon_flood",
         "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "RSTOS0", "data": "" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTOS0", "data": "" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR", "data": "" }
+          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "http", "conn_state": "RSTR" }
         ]
       },
       {
-        "title": "s1_s2_s0_chain_malicious",
+        "title": "repeated_rejection_spam",
         "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "S1", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "S2", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" }
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" }
         ]
       },
       {
-        "title": "covert_exfiltration_pattern",
+        "title": "state_s2_burst_spam",
         "packets": [
-          { "proto": "tcp", "service": "dns", "conn_state": "REJ", "data": "ODD_PACKET" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "EXFIL1" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1", "data": "EXFIL2" },
-          { "proto": "tcp", "service": "http", "conn_state": "SF", "data": "" }
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" }
+        ]
+      },
+      {
+        "title": "ssh_bruteforce_spam",
+        "packets": [
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" }
         ]
       }
     ],
-
+    "suspicious": [
+      {
+        "title": "tcp_repeated_rejection",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" }
+        ]
+      },
+      {
+        "title": "tcp_unusual_state_s2",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" }
+        ]
+      }
+      
+    ],
     "invalid": [
       {
-        "title": "tcp_handshake_never_finishes",
+        "title": "udp_flood_s0_invalid",
         "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" }
+          { "proto": "udp", "service": "-", "conn_state": "S0" },
+          { "proto": "udp", "service": "-", "conn_state": "S0" },
+          { "proto": "udp", "service": "-", "conn_state": "S0" }
         ]
       },
       {
-        "title": "fin_before_syn",
+        "title": "icmp_with_service_invalid",
         "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "SF", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "S0", "data": "" }
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" },
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" }
+        ]
+      }
+      ,
+      {
+        "title": "nested_tcp_invalid",
+        "packets": [
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" }
         ]
       },
       {
-        "title": "http_over_udp",
+        "title": "incomplete_tcp_session",
         "packets": [
-          { "proto": "udp", "service": "http", "conn_state": "SF", "data": "GET /" }
-        ]
-      },
-      {
-        "title": "dns_over_tcp_with_rstos0",
-        "packets": [
-          { "proto": "tcp", "service": "dns", "conn_state": "RSTOS0", "data": "" }
-        ]
-      },
-      {
-        "title": "multi_protocol_same_packet",
-        "packets": [
-          { "proto": "tcp,udp", "service": "dns", "conn_state": "S0", "data": "INVALID" }
-        ]
-      },
-      {
-        "title": "empty_packet_all_fields_missing",
-        "packets": [
-          { "proto": "", "service": "", "conn_state": "", "data": "" }
-        ]
-      },
-      {
-        "title": "udp_with_tcp_state_s1",
-        "packets": [
-          { "proto": "udp", "service": "dns", "conn_state": "S1", "data": "" }
-        ]
-      },
-      {
-        "title": "icmp_with_http_service",
-        "packets": [
-          { "proto": "icmp", "service": "http", "conn_state": "OTH", "data": "" }
-        ]
-      },
-      {
-        "title": "illegal_state_sequence_rstr_to_rej",
-        "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "RSTR", "data": "" },
-          { "proto": "tcp", "service": "", "conn_state": "REJ", "data": "" }
-        ]
-      },
-      {
-        "title": "dns_packet_with_http_payload",
-        "packets": [
-          { "proto": "udp", "service": "dns", "conn_state": "SF", "data": "GET /index" }
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" }
         ]
       }
     ]

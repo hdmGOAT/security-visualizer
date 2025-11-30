@@ -1,21 +1,19 @@
 import React from 'react';
 import type { Packet } from '../api/client';
+import Collapsible from './ui/Collapsible';
 
 interface Props {
     packets: Packet[];
     selectedIndex: number | null;
     onSelect: (idx: number) => void;
     flags?: boolean[]; // optional per-packet suspicious flags
+    compact?: boolean;
 }
 
 export const PacketList: React.FC<Props> = ({ packets, selectedIndex, onSelect, flags }) => {
     return (
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 h-64 flex flex-col">
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold">Last Request Packets</h3>
-                <div className="text-xs text-gray-500">Click a packet to inspect DFA check</div>
-            </div>
-            <div className="flex-1 overflow-y-auto text-xs font-mono space-y-1">
+        <Collapsible title={<div className="flex items-center justify-between w-full"><span className="font-semibold">Last Request Packets</span><span className="text-xs text-gray-500">Click a packet to inspect DFA check</span></div>} defaultOpen={true}>
+            <div className={`flex-1 overflow-y-auto text-xs font-mono space-y-1 ${packets.length > 6 ? 'max-h-40' : ''}`}>
                 {packets.map((p, i) => {
                     const isSuspicious = flags && flags[i];
                     return (
@@ -36,6 +34,6 @@ export const PacketList: React.FC<Props> = ({ packets, selectedIndex, onSelect, 
                 )})}
                 {packets.length === 0 && <div className="text-gray-400 italic">No recent request</div>}
             </div>
-        </div>
+        </Collapsible>
     );
 };

@@ -20,7 +20,7 @@ function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     
-    const [currentDFAState, setCurrentDFAState] = useState<string>("s4");
+    const [currentDFAState, setCurrentDFAState] = useState<string>("");
     const [packetHistory, setPacketHistory] = useState<Packet[]>([]);
     const [packetFlags, setPacketFlags] = useState<boolean[]>([]);
     const [derivationSteps, setDerivationSteps] = useState<string[]>([]);
@@ -37,6 +37,13 @@ function App() {
             .then(([g, pg]) => {
                 setGraphData(g);
                 setPdaGraphData(pg);
+
+                // Initialize current DFA state from the graph's start node
+                if (g && Array.isArray(g.nodes) && g.nodes.length > 0) {
+                    const startNode = g.nodes.find(n => !!(n as any).is_start) as any | undefined;
+                    const startId = startNode ? (startNode as any).id : (g.nodes[0] as any).id;
+                    if (startId) setCurrentDFAState(startId);
+                }
             })
             .catch(err => setError(err.message))
             .finally(() => setIsLoading(false));

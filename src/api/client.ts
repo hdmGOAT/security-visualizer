@@ -131,5 +131,42 @@ export const api = {
             throw new Error(text || 'Failed to send request');
         }
         return response.json();
+    },
+
+    uploadConfig: async (config: { dotContent?: string; grammarContent?: string; pdaDotContent?: string; pdaGrammarContent?: string }) => {
+        const response = await fetch(`${API_BASE}/config/upload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config),
+        });
+        if (!response.ok) throw new Error('Failed to upload config');
+        return response.json();
+    },
+
+    resetConfig: async () => {
+        const response = await fetch(`${API_BASE}/config/reset`, {
+            method: 'POST',
+        });
+        if (!response.ok) throw new Error('Failed to reset config');
+        return response.json();
+    },
+
+    listDatasets: async (): Promise<{ name: string; files: string[] }[]> => {
+        const response = await fetch(`${API_BASE}/datasets`);
+        if (!response.ok) throw new Error('Failed to list datasets');
+        return response.json();
+    },
+
+    loadDataset: async (filename: string): Promise<{ status: string; dot: string; grammar: string; output: string }> => {
+        const response = await fetch(`${API_BASE}/datasets/load`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename }),
+        });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || 'Failed to load dataset');
+        }
+        return response.json();
     }
 };

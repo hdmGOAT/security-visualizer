@@ -10,6 +10,7 @@ import DFAView from './components/DFAView';
 import { PDAView } from './components/PDAView';
 import DerivationModal from './components/DerivationModal';
 import GrammarModal from './components/GrammarModal';
+import ConfigModal from './components/ConfigModal';
 
 function App() {
     const [graphData, setGraphData] = useState<GraphData | undefined>(undefined);
@@ -30,6 +31,7 @@ function App() {
     const [showGrammar, setShowGrammar] = useState(false);
     const [pdaGrammarRules, setPdaGrammarRules] = useState<string[]>([]);
     const [showPdaGrammar, setShowPdaGrammar] = useState(false);
+    const [showConfig, setShowConfig] = useState(false);
     
     const [dfaResult, setDfaResult] = useState<DFAPacketResponse | null>(null);
     const [currentDfaStepIndex, setCurrentDfaStepIndex] = useState<number>(-1);
@@ -203,10 +205,17 @@ function App() {
 
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans text-gray-900 relative">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Network Automata Visualizer</h1>
-                <p className="text-gray-600 mt-2">Visualize PDA/DFA validation for IoT Malware detection</p>
-                {/* Derivation button moved into DFA view */}
+            <header className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800">Network Automata Visualizer</h1>
+                    <p className="text-gray-600 mt-2">Visualize PDA/DFA validation for IoT Malware detection</p>
+                </div>
+                <button 
+                    onClick={() => setShowConfig(true)}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 font-medium"
+                >
+                    Datasets
+                </button>
             </header>
 
             {/* top-level status banner removed — it will be shown near the packet selector */}
@@ -268,6 +277,7 @@ function App() {
                     <DerivationModal show={showDerivation} steps={derivationSteps} onClose={() => setShowDerivation(false)} />
                     <GrammarModal show={showGrammar} rules={grammarRules} title="DFA Grammar" onClose={() => setShowGrammar(false)} />
                     <GrammarModal show={showPdaGrammar} rules={pdaGrammarRules} title="PDA Grammar" onClose={() => setShowPdaGrammar(false)} />
+                    <ConfigModal isOpen={showConfig} onClose={() => setShowConfig(false)} />
 
                     {/* DFA Controls */}
                     {/* PDA/DFA graph and controls are rendered by the components above */}

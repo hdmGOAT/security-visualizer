@@ -17,9 +17,10 @@ interface Props {
     activeEdge?: { source: string; target: string } | null;
     onShowDerivation?: () => void;
     isSuspicious?: boolean;
+    onShowGrammar?: () => void;
 }
 
-export const DFAView: React.FC<Props> = ({ dfaResult, packet, currentStepIndex, isPlaying, onNext, onPrev, onReset, onPlayPause, graphData, activeNodeId, activeEdge, onShowDerivation, isSuspicious }) => {
+export const DFAView: React.FC<Props> = ({ dfaResult, packet, currentStepIndex, isPlaying, onNext, onPrev, onReset, onPlayPause, graphData, activeNodeId, activeEdge, onShowDerivation, onShowGrammar, isSuspicious }) => {
     const steps = dfaResult.steps || [];
     const isFinished = currentStepIndex >= steps.length;
 
@@ -42,12 +43,20 @@ export const DFAView: React.FC<Props> = ({ dfaResult, packet, currentStepIndex, 
                         {isFinished ? (dfaResult.is_malicious ? 'SUSPICIOUS PACKET DETECTED' : 'PACKET ACCEPTED (BENIGN)') : 'Processing Packet...'}
                     </h3>
                     <div className="ml-4">
-                        <button
-                            onClick={() => { if (typeof onShowDerivation === 'function') onShowDerivation(); }}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                        >
-                            Show Derivation
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => { if (typeof onShowDerivation === 'function') onShowDerivation(); }}
+                                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                            >
+                                Show Derivation
+                            </button>
+                            <button
+                                onClick={() => { if (typeof onShowGrammar === 'function') onShowGrammar(); }}
+                                className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                                View Grammar
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div className="flex gap-2 items-center">

@@ -17,9 +17,11 @@ interface Props {
     graphData?: GraphData;
     activeNodeId?: string;
     activeEdge?: { source: string; target: string } | null;
+    onShowDerivation?: () => void;
+    onShowGrammar?: () => void;
 }
 
-export const PDAView: React.FC<Props> = ({ validation, currentStepIndex, isPlaying, onNext, onPrev, onReset, onPlayPause, graphData, activeNodeId, activeEdge }) => {
+export const PDAView: React.FC<Props> = ({ validation, currentStepIndex, isPlaying, onNext, onPrev, onReset, onPlayPause, graphData, activeNodeId, activeEdge, onShowDerivation, onShowGrammar }) => {
     const step: StackOperation | undefined = validation?.trace[currentStepIndex];
     const proto = step?.symbol?.startsWith('proto=') ? step.symbol.split('=')[1] : '-';
     const service = step?.symbol?.startsWith('service=') ? step.symbol.split('=')[1] : '-';
@@ -75,8 +77,22 @@ export const PDAView: React.FC<Props> = ({ validation, currentStepIndex, isPlayi
 
                     <div className="mt-4">
                         <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                            <div className="mb-2">
+                            <div className="flex justify-between items-center mb-2">
                                 <h3 className="font-semibold">PDA Graph</h3>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { if (typeof onShowDerivation === 'function') onShowDerivation(); }}
+                                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                                    >
+                                        Show Derivation
+                                    </button>
+                                    <button
+                                        onClick={() => { if (typeof onShowGrammar === 'function') onShowGrammar(); }}
+                                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                    >
+                                        View Grammar
+                                    </button>
+                                </div>
                             </div>
                             <GraphView data={graphData} activeNodeId={activeNodeId} activeEdge={activeEdge} />
                         </div>

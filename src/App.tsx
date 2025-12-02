@@ -9,6 +9,7 @@ import { PacketList } from './components/PacketList';
 import DFAView from './components/DFAView';
 import { PDAView } from './components/PDAView';
 import DerivationModal from './components/DerivationModal';
+import GrammarModal from './components/GrammarModal';
 
 function App() {
     const [graphData, setGraphData] = useState<GraphData | undefined>(undefined);
@@ -25,6 +26,10 @@ function App() {
     const [packetFlags, setPacketFlags] = useState<boolean[]>([]);
     const [derivationSteps, setDerivationSteps] = useState<string[]>([]);
     const [showDerivation, setShowDerivation] = useState(false);
+    const [grammarRules, setGrammarRules] = useState<string[]>([]);
+    const [showGrammar, setShowGrammar] = useState(false);
+    const [pdaGrammarRules, setPdaGrammarRules] = useState<string[]>([]);
+    const [showPdaGrammar, setShowPdaGrammar] = useState(false);
     
     const [dfaResult, setDfaResult] = useState<DFAPacketResponse | null>(null);
     const [currentDfaStepIndex, setCurrentDfaStepIndex] = useState<number>(-1);
@@ -33,10 +38,13 @@ function App() {
     useEffect(() => {
         setIsLoading(true);
         setError(null);
-        Promise.all([api.getGraph(), api.getPDAGraph()])
-            .then(([g, pg]) => {
+        // fetch graphs and grammars in parallel
+    Promise.all([api.getGraph(), api.getPDAGraph(), api.getGrammar().catch(() => ({ rules: [] })), api.getPDAGrammar().catch(() => ({ rules: [] }))])
+            .then(([g, pg, gRules, pRules]) => {
                 setGraphData(g);
                 setPdaGraphData(pg);
+        setGrammarRules(gRules.rules || []);
+        setPdaGrammarRules(pRules.rules || []);
 
                 // Initialize current DFA state from the graph's start node
                 if (g && Array.isArray(g.nodes) && g.nodes.length > 0) {
@@ -156,6 +164,32 @@ function App() {
         }
     };
 
+    const handleShowGrammar = () => {
+        setShowGrammar(true);
+    };
+
+    const handleShowPDAGrammar = () => {
+        setShowPdaGrammar(true);
+    };
+
+    const handleShowPDADerivation = async () => {
+        setIsLoading(true);
+        try {
+            if (!packetHistory || packetHistory.length === 0) {
+                setError('No packet history available for PDA derivation');
+                setIsLoading(false);
+                return;
+            }
+            const res = await api.getPDADerivation(packetHistory);
+            setDerivationSteps(res.steps || []);
+            setShowDerivation(true);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch PDA derivation');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const { activeNodeId, activeEdge } = useActiveHighlight({
         dfaResult,
         currentDfaStepIndex,
@@ -206,6 +240,7 @@ function App() {
                                 activeNodeId={activeNodeId}
                                 activeEdge={activeEdge}
                             onShowDerivation={handleShowDerivation}
+                            onShowGrammar={handleShowGrammar}
                             isSuspicious={selectedPacketIndex !== null ? (!!packetFlags[selectedPacketIndex]) : false}
                         />
                     ) : (
@@ -221,7 +256,9 @@ function App() {
                                 graphData={pdaGraphData}
                                     activeNodeId={activeNodeId}
                                     activeEdge={activeEdge}
-                            />
+                    onShowDerivation={handleShowPDADerivation}
+                    onShowGrammar={handleShowPDAGrammar}
+                />
                         )
                     )}
 
@@ -229,6 +266,8 @@ function App() {
 
                     {/* Derivation Modal */}
                     <DerivationModal show={showDerivation} steps={derivationSteps} onClose={() => setShowDerivation(false)} />
+                    <GrammarModal show={showGrammar} rules={grammarRules} title="DFA Grammar" onClose={() => setShowGrammar(false)} />
+                    <GrammarModal show={showPdaGrammar} rules={pdaGrammarRules} title="PDA Grammar" onClose={() => setShowPdaGrammar(false)} />
 
                     {/* DFA Controls */}
                     {/* PDA/DFA graph and controls are rendered by the components above */}

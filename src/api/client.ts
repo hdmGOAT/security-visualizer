@@ -95,6 +95,31 @@ export const api = {
         return response.json();
     },
 
+    // Fetch active grammar used by the DFA
+    getGrammar: async (): Promise<{ rules: string[] }> => {
+        const response = await fetch(`${API_BASE}/grammar`);
+        if (!response.ok) throw new Error('Failed to fetch grammar');
+        return response.json();
+    },
+
+    // Fetch active grammar used by the PDA (if backend exposes separate endpoint)
+    getPDAGrammar: async (): Promise<{ rules: string[] }> => {
+        const response = await fetch(`${API_BASE}/pda/grammar`);
+        if (!response.ok) throw new Error('Failed to fetch PDA grammar');
+        return response.json();
+    },
+
+    // Request a PDA-style derivation for a packet history (frontend will pass packets)
+    getPDADerivation: async (packets: Packet[]): Promise<{ steps: string[] }> => {
+        const response = await fetch(`${API_BASE}/pda/derivation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packets }),
+        });
+        if (!response.ok) throw new Error('Failed to fetch PDA derivation');
+        return response.json();
+    },
+
     sendRequest: async (packets: Packet[], threshold = 1): Promise<RequestProcessingResponse> => {
         const response = await fetch(`${API_BASE}/request/process`, {
             method: 'POST',

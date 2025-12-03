@@ -133,8 +133,8 @@
       {
         "title": "icmp_with_service_invalid",
         "packets": [
-          { "proto": "icmp", "service": "-", "conn_state": "OTH" },
-          { "proto": "icmp", "service": "-", "conn_state": "OTH" }
+          { "proto": "icmp", "service": "dns", "conn_state": "OTH" },
+          { "proto": "icmp", "service": "dns", "conn_state": "OTH" }
         ]
       }
       ,

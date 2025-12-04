@@ -25,18 +25,6 @@
           { "proto": "udp", "service": "dns", "conn_state": "OTH" },
           { "proto": "udp", "service": "dns", "conn_state": "OTH" }
         ]
-      },
-      {
-        "title": "multi_service_handshake",
-        "packets": [
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "SF" },
-          { "proto": "tcp", "service": "http", "conn_state": "S0" },
-          { "proto": "tcp", "service": "http", "conn_state": "S1" },
-          { "proto": "tcp", "service": "http", "conn_state": "SF" },
-          { "proto": "udp", "service": "dns", "conn_state": "OTH" }
-        ]
       }
     ],
     "malicious": [
@@ -62,13 +50,13 @@
         ]
       },
       {
-        "title": "http_c2_beacon_flood",
+        "title": "c2_beacon_flood",
         "packets": [
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "http", "conn_state": "RSTR" }
+          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "", "conn_state": "RSTR" }
         ]
       },
       {
@@ -90,17 +78,6 @@
           { "proto": "tcp", "service": "-", "conn_state": "S2" },
           { "proto": "tcp", "service": "-", "conn_state": "S2" },
           { "proto": "tcp", "service": "-", "conn_state": "S2" }
-        ]
-      },
-      {
-        "title": "ssh_bruteforce_spam",
-        "packets": [
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" },
-          { "proto": "tcp", "service": "ssh", "conn_state": "REJ" }
         ]
       }
     ],

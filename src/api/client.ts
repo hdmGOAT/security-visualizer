@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const HEADERS = { 'ngrok-skip-browser-warning': 'true' };
+const JSON_HEADERS = { 'Content-Type': 'application/json', ...HEADERS };
 
 export interface Packet {
     proto: string;
@@ -51,7 +53,7 @@ export const api = {
     sendPacket: async (packet: Packet): Promise<DFAPacketResponse> => {
         const response = await fetch(`${API_BASE}/dfa/step`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ packet }),
         });
         if (!response.ok) {
@@ -63,7 +65,7 @@ export const api = {
     validateHistory: async (history: string[]): Promise<PDAValidationResponse> => {
         const response = await fetch(`${API_BASE}/pda/validate`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ history }),
         });
         if (!response.ok) {
@@ -74,13 +76,13 @@ export const api = {
     },
 
     getGraph: async (): Promise<GraphData> => {
-        const response = await fetch(`${API_BASE}/graph`);
+        const response = await fetch(`${API_BASE}/graph`, { headers: HEADERS });
         if (!response.ok) throw new Error('Failed to fetch graph');
         return response.json();
     },
 
     getPDAGraph: async (): Promise<GraphData> => {
-        const response = await fetch(`${API_BASE}/pda/graph`);
+        const response = await fetch(`${API_BASE}/pda/graph`, { headers: HEADERS });
         if (!response.ok) throw new Error('Failed to fetch PDA graph');
         return response.json();
     },
@@ -88,7 +90,7 @@ export const api = {
     getDerivation: async (packet: Packet): Promise<{ steps: string[] }> => {
         const response = await fetch(`${API_BASE}/derivation`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ packet }),
         });
         if (!response.ok) throw new Error('Failed to fetch derivation');
@@ -97,14 +99,14 @@ export const api = {
 
     // Fetch active grammar used by the DFA
     getGrammar: async (): Promise<{ rules: string[] }> => {
-        const response = await fetch(`${API_BASE}/grammar`);
+        const response = await fetch(`${API_BASE}/grammar`, { headers: HEADERS });
         if (!response.ok) throw new Error('Failed to fetch grammar');
         return response.json();
     },
 
     // Fetch active grammar used by the PDA (if backend exposes separate endpoint)
     getPDAGrammar: async (): Promise<{ rules: string[] }> => {
-        const response = await fetch(`${API_BASE}/pda/grammar`);
+        const response = await fetch(`${API_BASE}/pda/grammar`, { headers: HEADERS });
         if (!response.ok) throw new Error('Failed to fetch PDA grammar');
         return response.json();
     },
@@ -113,7 +115,7 @@ export const api = {
     getPDADerivation: async (packets: Packet[]): Promise<{ steps: string[] }> => {
         const response = await fetch(`${API_BASE}/pda/derivation`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ packets }),
         });
         if (!response.ok) throw new Error('Failed to fetch PDA derivation');
@@ -123,7 +125,7 @@ export const api = {
     sendRequest: async (packets: Packet[], threshold = 1): Promise<RequestProcessingResponse> => {
         const response = await fetch(`${API_BASE}/request/process`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ packets, threshold }),
         });
         if (!response.ok) {
@@ -136,7 +138,7 @@ export const api = {
     uploadConfig: async (config: { dotContent?: string; grammarContent?: string; pdaDotContent?: string; pdaGrammarContent?: string }) => {
         const response = await fetch(`${API_BASE}/config/upload`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify(config),
         });
         if (!response.ok) throw new Error('Failed to upload config');
@@ -146,13 +148,14 @@ export const api = {
     resetConfig: async () => {
         const response = await fetch(`${API_BASE}/config/reset`, {
             method: 'POST',
+            headers: HEADERS,
         });
         if (!response.ok) throw new Error('Failed to reset config');
         return response.json();
     },
 
     listDatasets: async (): Promise<{ name: string; files: string[] }[]> => {
-        const response = await fetch(`${API_BASE}/datasets`);
+        const response = await fetch(`${API_BASE}/datasets`, { headers: HEADERS });
         if (!response.ok) throw new Error('Failed to list datasets');
         return response.json();
     },
@@ -160,7 +163,7 @@ export const api = {
     loadDataset: async (filename: string): Promise<{ status: string; dot: string; grammar: string; output: string }> => {
         const response = await fetch(`${API_BASE}/datasets/load`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: JSON_HEADERS,
             body: JSON.stringify({ filename }),
         });
         if (!response.ok) {

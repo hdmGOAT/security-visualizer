@@ -25,6 +25,13 @@
           { "proto": "udp", "service": "dns", "conn_state": "OTH" },
           { "proto": "udp", "service": "dns", "conn_state": "OTH" }
         ]
+      },
+      {
+        "title": "icmp_valid",
+        "packets": [
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" },
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" }
+        ]
       }
     ],
     "malicious": [
@@ -52,11 +59,11 @@
       {
         "title": "c2_beacon_flood",
         "packets": [
-          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "", "conn_state": "RSTR" },
-          { "proto": "tcp", "service": "", "conn_state": "RSTR" }
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" }
         ]
       },
       {

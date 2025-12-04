@@ -33,7 +33,8 @@ export const InputSection: React.FC<InputSectionProps> = ({ onSendRequest, isLoa
 
     useEffect(() => {
         // Load templates.json from public/ folder
-        fetch('/templates.json')
+        // Use import.meta.env.BASE_URL to respect the deployment base path
+        fetch(`${import.meta.env.BASE_URL}templates.json`)
             .then(r => r.json())
             .then(setTemplates)
             .catch(() => setTemplates(undefined));

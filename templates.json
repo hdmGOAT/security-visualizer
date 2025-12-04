@@ -1,0 +1,144 @@
+{
+  "categories": {
+    "benign": [
+      {
+        "title": "tcp_http_standard_session",
+        "packets": [
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" }
+        ]
+      },
+      {
+        "title": "tcp_ssh_standard_session",
+        "packets": [
+          { "proto": "tcp", "service": "ssh", "conn_state": "S0" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "S1" },
+          { "proto": "tcp", "service": "ssh", "conn_state": "SF" }
+        ]
+      },
+      {
+        "title": "udp_dns_normal_query",
+        "packets": [
+          { "proto": "udp", "service": "dns", "conn_state": "OTH" },
+          { "proto": "udp", "service": "dns", "conn_state": "OTH" }
+        ]
+      },
+      {
+        "title": "icmp_valid",
+        "packets": [
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" },
+          { "proto": "icmp", "service": "-", "conn_state": "OTH" }
+        ]
+      }
+    ],
+    "malicious": [
+      {
+        "title": "tcp_syn_flood_scan",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" },
+          { "proto": "tcp", "service": "-", "conn_state": "S0" }
+        ]
+      },
+      {
+        "title": "irc_botnet_traffic_flood",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" },
+          { "proto": "tcp", "service": "-", "conn_state": "S1" }
+        ]
+      },
+      {
+        "title": "c2_beacon_flood",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" },
+          { "proto": "tcp", "service": "-", "conn_state": "RSTR" }
+        ]
+      },
+      {
+        "title": "repeated_rejection_spam",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" }
+        ]
+      },
+      {
+        "title": "state_s2_burst_spam",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" }
+        ]
+      }
+    ],
+    "suspicious": [
+      {
+        "title": "tcp_repeated_rejection",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" },
+          { "proto": "tcp", "service": "-", "conn_state": "REJ" }
+        ]
+      },
+      {
+        "title": "tcp_unusual_state_s2",
+        "packets": [
+          { "proto": "tcp", "service": "-", "conn_state": "S2" },
+          { "proto": "tcp", "service": "-", "conn_state": "S2" }
+        ]
+      }
+      
+    ],
+    "invalid": [
+      {
+        "title": "udp_flood_s0_invalid",
+        "packets": [
+          { "proto": "udp", "service": "-", "conn_state": "S0" },
+          { "proto": "udp", "service": "-", "conn_state": "S0" },
+          { "proto": "udp", "service": "-", "conn_state": "S0" }
+        ]
+      },
+      {
+        "title": "icmp_with_service_invalid",
+        "packets": [
+          { "proto": "icmp", "service": "dns", "conn_state": "OTH" },
+          { "proto": "icmp", "service": "dns", "conn_state": "OTH" }
+        ]
+      }
+      ,
+      {
+        "title": "nested_tcp_invalid",
+        "packets": [
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" },
+          { "proto": "tcp", "service": "http", "conn_state": "SF" }
+        ]
+      },
+      {
+        "title": "incomplete_tcp_session",
+        "packets": [
+          { "proto": "tcp", "service": "http", "conn_state": "S0" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" },
+          { "proto": "tcp", "service": "http", "conn_state": "S1" }
+        ]
+      }
+    ]
+  }
+}
